@@ -3,7 +3,7 @@ import { mockUsers, type User } from './data/users';
 import { evaluateMatch, type MatchReasoning } from './lib/matchmaker';
 import {
   Users, LayoutDashboard, Search, ShieldAlert, BrainCircuit, X, MessageSquare,
-  PlayCircle, PauseCircle, Activity, Trash2, Video, Heart,
+  PlayCircle, PauseCircle, Activity, Trash2, Video, Heart, Menu,
   ArrowUpDown, CheckCircle, XCircle, AlertTriangle, Save
 } from 'lucide-react';
 
@@ -16,6 +16,7 @@ function App() {
   const [users, setUsers] = useState<User[]>(mockUsers);
   const [activeNav, setActiveNav] = useState<NavPage>('members');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Filters
   const [filterPipeline, setFilterPipeline] = useState<string>('all');
@@ -219,8 +220,15 @@ function App() {
   // ========================================================================
   return (
     <div className="dashboard-layout">
+      {/* Mobile hamburger */}
+      <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
+        <Menu size={20} />
+      </button>
+      {/* Mobile sidebar backdrop */}
+      <div className={`sidebar-backdrop ${sidebarOpen ? 'open' : ''}`} onClick={() => setSidebarOpen(false)} />
+
       {/* Sidebar */}
-      <aside className="dashboard-sidebar">
+      <aside className={`dashboard-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div style={{ padding: '24px', borderBottom: '1px solid var(--border-light)' }}>
           <h1 className="heading-4 flex items-center gap-2">
             <BrainCircuit color="var(--interaction-blue)" /> AndWeMet
@@ -234,7 +242,7 @@ function App() {
           ].map(item => (
             <button key={item.key} className="btn-ghost flex items-center gap-2 w-full"
               style={{ justifyContent: 'flex-start', fontWeight: activeNav === item.key ? 600 : 400, color: activeNav === item.key ? 'var(--interaction-blue)' : 'var(--cohere-black)' }}
-              onClick={() => { setActiveNav(item.key); setCurrentPage(1); }}>
+              onClick={() => { setActiveNav(item.key); setCurrentPage(1); setSidebarOpen(false); }}>
               {item.icon} {item.label}
             </button>
           ))}
@@ -249,7 +257,7 @@ function App() {
             <h2 className="heading-3">Stats Dashboard</h2>
 
             {/* Row 1: Big counters */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+            <div className="stats-grid-4">
               {[
                 { label: 'Total Active', value: stats.total },
                 { label: 'Male / Female', value: `${stats.males} / ${stats.females}` },
@@ -264,7 +272,7 @@ function App() {
             </div>
 
             {/* Row 2: Top cities + gender ratio */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="stats-grid-2">
               <div className="cohere-card" style={{ padding: '24px' }}>
                 <div className="mono-label" style={{ marginBottom: '16px' }}>Top Cities</div>
                 {stats.topCities.map(([city, count]) => (
@@ -315,7 +323,7 @@ function App() {
             </div>
 
             {/* Filters row */}
-            <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+            <div className="filter-row">
               <select className="cohere-select" style={{ width: 'auto', minWidth: '160px' }} value={filterPipeline} onChange={e => { setFilterPipeline(e.target.value); setCurrentPage(1); }}>
                 <option value="all">All Statuses</option>
                 <option value="Available">Approved</option>
@@ -352,7 +360,7 @@ function App() {
             </div>
 
             {/* Table */}
-            <div className="cohere-card" style={{ overflow: 'hidden' }}>
+            <div className="cohere-card table-wrapper">
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead style={{ background: 'var(--snow)', borderBottom: '1px solid var(--border-cool)' }}>
                   <tr>
@@ -492,7 +500,7 @@ function App() {
                         </div>
                       )}
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div className="profile-detail-grid">
                       {([
                         ['first_name', 'Name (read-only)'],
                         ['email', 'Email'],
@@ -520,7 +528,7 @@ function App() {
                   </div>
 
                   {/* Admin CRM Row */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div className="crm-grid">
                     {/* Actions */}
                     <div className="cohere-card" style={{ padding: '20px', background: 'var(--snow)' }}>
                       <div className="mono-label" style={{ marginBottom: '12px' }}>Admin Actions</div>
@@ -649,7 +657,7 @@ function App() {
                 <div className="flex-col gap-3">
                   <div className="cohere-card" style={{ padding: '24px' }}>
                     <div className="heading-4" style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Relationship Criteria</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div className="profile-detail-grid">
                       {([
                         ['relationship_status', 'Current Status'],
                         ['seeking_relationship_type', 'Seeking'],
@@ -677,7 +685,7 @@ function App() {
               {/* === ENGAGEMENT TAB === */}
               {profileTab === 'engagement' && (
                 <div className="flex-col gap-3">
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                  <div className="engagement-grid">
                     <div className="cohere-card" style={{ padding: '20px' }}>
                       <div className="mono-label">Engagement Level</div>
                       <div className="heading-3" style={{ color: engagementColor(selectedUser.engagement_level) }}>{selectedUser.engagement_level}</div>
